@@ -16,19 +16,18 @@ const run = (vscode: any) => {
   if (file === null) {
     return;
   }
-  const timeStr = `------------${moment().format('HH:mm:ss')}------------`;
+  const timeStr = `${moment().format('HH:mm:ss')} => `;
   exec(`node ${file}`, (err: Error, stdout: string, stderr: string) => {
+    vscode.debug.activeDebugConsole.append(timeStr);
     if (err) {
-      vscode.debug.activeDebugConsole.appendLine(err);
-      return vscode.debug.activeDebugConsole.appendLine(timeStr);
+      return vscode.debug.activeDebugConsole.appendLine(err);
     }
     if (stdout) {
-      vscode.debug.activeDebugConsole.appendLine(stdout, 'fldsjfl');
+      vscode.debug.activeDebugConsole.appendLine(stdout);
     }
     if (stderr) {
       vscode.debug.activeDebugConsole.appendLine(stderr);
     }
-    vscode.debug.activeDebugConsole.appendLine(timeStr);
   });
   // 在当前环境中执行当前文件
 };
