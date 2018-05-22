@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import * as moment from 'moment';
 const babylon = require('babylon');
 const os = require('os');
 const { exec } = require('child_process');
@@ -15,16 +16,19 @@ const run = (vscode: any) => {
   if (file === null) {
     return;
   }
+  const timeStr = `------------${moment().format('HH:mm:ss')}------------`;
   exec(`node ${file}`, (err: Error, stdout: string, stderr: string) => {
     if (err) {
-      return console.error(err);
+      vscode.debug.activeDebugConsole.appendLine(err);
+      return vscode.debug.activeDebugConsole.appendLine(timeStr);
     }
     if (stdout) {
-      console.log(stdout);
+      vscode.debug.activeDebugConsole.appendLine(stdout, 'fldsjfl');
     }
     if (stderr) {
-      console.warn(stderr);
+      vscode.debug.activeDebugConsole.appendLine(stderr);
     }
+    vscode.debug.activeDebugConsole.appendLine(timeStr);
   });
   // 在当前环境中执行当前文件
 };
