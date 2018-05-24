@@ -1,91 +1,41 @@
-import * as fs from 'fs';
-import * as path from 'path';
 import * as moment from 'moment';
-const babylon = require('babylon');
-const os = require('os');
-const { exec } = require('child_process');
 
-let lastFunc: string;
+import { getEnv } from '../libs/env';
+import * as commonRunner from './commonRunner';
+import * as sailsRunner from './sailsRunner';
 
 const run = (vscode: any) => {
-  // TODO 获取当前环境
+  const vsConsole = vscode.debug.activeDebugConsole;
+  vsConsole.append(`${moment().format('HH:mm:ss')} => `);
 
-  // 获取当前文件
-  const editor = vscode.window.activeTextEditor;
-  const file = genFile(editor);
-  if (file === null) {
-    return;
+  if (!canRun(vscode.window.activeTextEditor)) {
+    return vsConsole.appendLine('itwork-js 无法运行改文件！');
   }
-  const timeStr = `${moment().format('HH:mm:ss')} => `;
-  exec(`node ${file}`, (err: Error, stdout: string, stderr: string) => {
-    vscode.debug.activeDebugConsole.append(timeStr);
-    if (err) {
-      return vscode.debug.activeDebugConsole.appendLine(err);
+
+  let result: string = '';
+  try {
+    const env = getEnv(vscode.workspace.rootPath);
+    if (!env) {
+      result = commonRunner.run(vscode);
     }
-    if (stdout) {
-      vscode.debug.activeDebugConsole.appendLine(stdout);
+    if (/^sails@.*/.test(env)) {
+      result = sailsRunner.run(vscode, env);
     }
-    if (stderr) {
-      vscode.debug.activeDebugConsole.appendLine(stderr);
-    }
-  });
-  // 在当前环境中执行当前文件
+  } catch (err) {
+    return vsConsole.appendLine(err.message);
+  }
+  vsConsole.appendLine(result);
 };
 
-const genFile = (editor: any) => {
-  if (!editor || editor.document.isUntitled || editor.document.languageId !== 'javascript') {
+const canRun = (editor: any) => {
+  const languages = ['javascript', 'typescript'];
+  const languageId = editor.document.languageId;
+  const isIn = languages.indexOf(languageId) !== -1;
+  if (!editor || editor.document.isUntitled || !isIn) {
     return false;
   }
-  const fileName = editor.document.fileName;
-  const destFile = path.dirname(fileName) + path.sep + path.basename(fileName) + '.iw' + path.extname(fileName);
-  const code = editor.document.getText();
-  fs.writeFileSync(destFile, code);
-
-  const codeTree = babylon.parse(code);
-  const callCode = genCallCode(editor, codeTree);
-  fs.appendFileSync(destFile, os.EOL);
-  fs.appendFileSync(destFile, `console.log(${callCode})`);
-  return destFile;
+  return true;
 };
-
-const genCallCode = (editor: any, codeTree: any) => {
-  const selection = editor.selection;
-  const func = editor.document.getText(selection);
-  lastFunc = func || lastFunc;
-
-  const params = getParams(codeTree, lastFunc);
-  return lastFunc ? `${lastFunc}(${params.join(',')})` : '';
-};
-
-const getParams = (codeTree: any, funcName: string): any[] => {
-  // console.log(codeTree);
-  for (const obj of codeTree.program.body) {
-    if (obj.type === 'VariableDeclaration') {
-      if (obj.declarations[0].id.name === funcName) {
-        return getFuncParams(obj);
-      }
-    }
-    if (obj.type === 'FunctionDeclaration') {
-      if (obj.id.name === funcName) {
-        return getFuncParams(obj);
-      }
-    }
-  }
-  return [];
-};
-
-const getFuncParams = (obj: any) => {
-  let params: any[] = [];
-  const trim = (str: string) => str.replace(/(^\s+)|(\s+$)/g, '');
-  obj.leadingComments.map((c: any) => {
-    const arr = c.value.split(';').filter((s: any) => !!trim(s));
-    const subParams = arr.map((a: any) => trim(a.split('=')[1]));
-    params = params.concat(subParams);
-  });
-  return params;
-};
-
-
 
 export {
   run
