@@ -5,10 +5,12 @@ const getEnv = (rootPath: string): string => {
   if (!fs.existsSync(filePath)) {
     return '';
   }
-  const packageJSON = fs.readFileSync(filePath).toString();
-  const packageObj = JSON.parse(packageJSON)
+  if (fs.existsSync(`${rootPath}/.sailsrc`)) {
+    return 'sails@1.0.0';
+  }
+  // const packageJSON = fs.readFileSync(filePath).toString();
+  // const packageObj = JSON.parse(packageJSON)
   return '';
-  // const packageInfo = JSON.parse(fs.readdirSync(filePath));
 };
 
 export {
