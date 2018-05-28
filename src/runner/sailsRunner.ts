@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs';
-const { exec } = require('child_process');
+import { execSync } from '../libs/exec';
 // import { mkdirsSync } from '../libs/file';
 import { getParams } from '../libs/parses/jsParse';
 
@@ -9,14 +9,7 @@ const run = async (vscode: any, funcName: string, env: string) => {
   const rootPath = vscode.workspace.rootPath;
   const cmd = `cd ${rootPath} && node ${rootPath}/node_modules/mocha/bin/mocha -t 20000 ${rootPath}/tests/lifecycle.test.js ${file}`;
   console.log('will run cmd: ', cmd);
-  return await new Promise((resolve, reject) => {
-    exec(cmd, (err: any, stdout: any, stderr: any) => {
-      if (stdout) {
-        return resolve(stdout);
-      }
-      return resolve(stderr);
-    });
-  });
+  return await execSync(cmd);
 };
 
 const genFile = (vscode: any, funcName: string) => {
