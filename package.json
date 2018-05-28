@@ -2,8 +2,9 @@
     "name": "itwork-js",
     "displayName": "itwork-js",
     "description": "",
-    "version": "0.0.2",
+    "version": "1.0.0",
     "publisher": "zhangliu",
+    "repository": "https://github.com/zhangliu/itwork-js",
     "engines": {
         "vscode": "^1.22.0"
     },
@@ -18,6 +19,7 @@
         "keybindings": [
             {
                 "command": "extension.toRun",
+                "describe": "运行选中的方法",
                 "key": "ctrl+e",
                 "mac": "cmd+e"
             }
