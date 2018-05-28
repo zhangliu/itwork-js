@@ -38,7 +38,7 @@
         "@types/mocha": "^2.2.42"
     },
     "dependencies": {
-        "babylon": "^6.18.0",
+        "@babel/parser": "^7.0.0-beta.48",
         "moment": "^2.22.1"
     }
 }
