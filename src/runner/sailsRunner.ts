@@ -5,55 +5,83 @@ import { execSync } from '../libs/exec';
 import { getParams } from '../libs/parses/jsParse';
 
 const run = async (vscode: any, funcName: string, env: string) => {
-  const file = genFile(vscode, funcName);
+  const file = genCodeFile(vscode, funcName);
   const rootPath = vscode.workspace.rootPath;
-  const cmd = `cd ${rootPath} && node ${rootPath}/node_modules/mocha/bin/mocha -t 20000 ${rootPath}/tests/lifecycle.test.js ${file}`;
+  const iwFile = genIWFile(rootPath, file);
+  const cmd = `cd ${rootPath} && node ${iwFile}`;
   console.log('will run cmd: ', cmd);
   return await execSync(cmd);
 };
 
-const genFile = (vscode: any, funcName: string) => {
+const genCodeFile = (vscode: any, funcName: string) => {
   const fileName = vscode.window.activeTextEditor.document.fileName;
   const basename = path.basename(fileName);
   const isController = /Controller\.[^\.]+$/.test(basename);
   if (isController) {
-    return genControllerTestFile(vscode, funcName, fileName);
+    return genControllerFile(vscode, funcName, fileName);
   }
   throw new Error('itwork-js 无法处理改文件！');
 };
 
-const genControllerTestFile = (vscode: any, funcName: string, fileName: string) => {
-  const destFile = path.dirname(fileName) + path.sep + '.' + path.basename(fileName) + '.iw';
+const genControllerFile = (vscode: any, funcName: string, fileName: string) => {
+  const destFile = path.dirname(fileName) + path.sep + '.' + path.basename(fileName);
 
   const code = vscode.window.activeTextEditor.document.getText();
   const params = getParams(code, funcName);
-
-  fs.writeFileSync(destFile, genTestCode(code, funcName, params));
+  const scriptType = vscode.window.activeTextEditor.document.languageId;
+  fs.writeFileSync(destFile, genCallCode(code, funcName, params, scriptType));
   return destFile;
 };
 
-const genTestCode = (code: string, funcName: string, params: any[]) => {
+const genCallCode = (code: string, funcName: string, params: any[], scriptType: string) => {
+  const isTs = scriptType === 'typescript';
   const resCode = `
   const res = {
-    ok: v => console.log(v)
+    ok: v => v,
+    wrap: async fn => await fn()
   }
   `;
-  let resultCode = `await ${funcName}(${params.join(',')})`;
+  let resultCode = `return await ${funcName}(${params.join(',')})`;
   if (params.length === 0) {
-    resultCode = `iwResult = await ${funcName} ({}, res)`;
+    resultCode = `return await ${funcName} ({}, res)`;
   }
   if (params.length === 1) {
-    resultCode = `iwResult = await ${funcName} (${params[0]}, res)`;
+    resultCode = `return await ${funcName} (${params[0]}, res)`;
   }
-  return `describe('', () => {
-    it('', async () => {
-      ${code}
-      let iwResult
-      ${resCode}
-      ${resultCode}
-      console.log(iwResult)
-    })
-  })`;
+  return `
+  ${isTs ? 'declare var console: any;' : ''}
+  ${isTs ? 'declare var process: any;' : ''}
+  ${code}
+  const iwResult = async () => {
+    ${resCode}
+    ${resultCode}
+  }
+  iwResult().then(console.log).then(process.exit).catch(err => {
+    console.log(err)
+    process.exit()
+  })
+  `;
+};
+
+const genIWFile = (rootPath: string, codeFile: string) => {
+  const code = `
+    require('ts-node/register');
+
+    const sails = require('sails');
+
+    sails.lift({
+      hooks: { grunt: false },
+      log: { level: 'warn' },
+    }, (err) => {
+      if (err) {
+        return console.log(err);
+      }
+      require('${codeFile}');
+    });
+  `;
+  const file = `${rootPath}/.iw.js`;
+  fs.writeFileSync(file, code);
+  return file;
 };
 
 export {

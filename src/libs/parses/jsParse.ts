@@ -1,7 +1,8 @@
 const babylon = require('babylon');
 
 const getParams = (code: any, funcName: string): any[] => {
-  const codeTree = babylon.parse(code);
+  const plugins = ['typescript', 'objectRestSpread'];
+  const codeTree = babylon.parse(code, { allowImportExportEverywhere: true, sourceType: 'module', plugins });
   for (const obj of codeTree.program.body) {
     if (obj.type === 'VariableDeclaration') {
       if (obj.declarations[0].id.name === funcName) {
