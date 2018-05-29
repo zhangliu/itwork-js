@@ -11,7 +11,7 @@ const run = (vscode: any, funcName: string) => {
 
 const genFile = (editor: any, funcName: string) => {
   const fileName = editor.document.fileName;
-  const destFile = path.dirname(fileName) + path.sep + '.iw.' + path.basename(fileName);
+  const destFile = path.dirname(fileName) + path.sep + '.iw' + path.extname(fileName);
   const code = editor.document.getText();
 
   const params = getParams(code, funcName);

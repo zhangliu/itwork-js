@@ -24,7 +24,7 @@ const genCodeFile = (vscode: any, funcName: string) => {
 };
 
 const genControllerFile = (vscode: any, funcName: string, fileName: string) => {
-  const destFile = path.dirname(fileName) + path.sep + '.iw.' + path.basename(fileName);
+  const destFile = path.dirname(fileName) + path.sep + '.iw' + path.extname(fileName);
 
   const code = vscode.window.activeTextEditor.document.getText();
   const params = getParams(code, funcName);
@@ -79,7 +79,7 @@ const genIWFile = (rootPath: string, codeFile: string) => {
       require('${codeFile}');
     });
   `;
-  const file = `${rootPath}/.iw.js`;
+  const file = `${rootPath}/.iw.boot.js`;
   fs.writeFileSync(file, code);
   return file;
 };
