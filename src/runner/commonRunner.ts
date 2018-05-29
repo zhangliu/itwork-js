@@ -11,7 +11,7 @@ const run = (vscode: any, funcName: string) => {
 
 const genFile = (editor: any, funcName: string) => {
   const fileName = editor.document.fileName;
-  const destFile = path.dirname(fileName) + path.sep + '.' + path.basename(fileName) + '.iw';
+  const destFile = path.dirname(fileName) + path.sep + '.iw.' + path.basename(fileName);
   const code = editor.document.getText();
 
   const params = getParams(code, funcName);
@@ -22,7 +22,8 @@ const genFile = (editor: any, funcName: string) => {
 const genCallCode = (code: string, funcName: string, params: any[]) => {
   return `
     ${code}
-    ${funcName}(${params.join(',')})
+    const iwResult = async () => await ${funcName}(${params.join(',')})
+    iwResult().then(console.log)
   `;
 };
 
