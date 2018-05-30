@@ -1,21 +1,22 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { getParams } from '../libs/parses/jsParse';
+import { parse } from '../libs/parses/jsParse';
 const { execSync } = require('child_process');
+import { mVscode } from '../libs/mVscode';
 
-const run = (vscode: any, funcName: string) => {
-  const editor = vscode.window.activeTextEditor;
-  const file = genFile(editor, funcName);
+const run = (funcName: string) => {
+  const file = genFile(funcName);
   return execSync(`node ${file}`);
 };
 
-const genFile = (editor: any, funcName: string) => {
-  const fileName = editor.document.fileName;
+const genFile = (funcName: string) => {
+  const fileName = mVscode.fileName;
   const destFile = path.dirname(fileName) + path.sep + '.iw' + path.extname(fileName);
-  const code = editor.document.getText();
+  const code = mVscode.documentText;
 
-  const params = getParams(code, funcName);
-  fs.writeFileSync(destFile, genCallCode(code, funcName, params));
+  const funcInfo = parse(code, funcName);
+  mVscode.log(`解析出函数名：${funcInfo.funcName}，参数：${funcInfo.params}`);
+  fs.writeFileSync(destFile, genCallCode(code, funcInfo.funcName, funcInfo.params));
   return destFile;
 };
 

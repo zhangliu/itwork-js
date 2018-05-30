@@ -1,43 +1,43 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import { execSync } from '../libs/exec';
-// import { mkdirsSync } from '../libs/file';
-import { getParams } from '../libs/parses/jsParse';
+import { mVscode } from '../libs/mVscode';
+import { parse } from '../libs/parses/jsParse';
 
-const run = async (vscode: any, funcName: string, env: string) => {
-  const file = genCodeFile(vscode, funcName);
-  const rootPath = vscode.workspace.rootPath;
-  const iwFile = genIWFile(rootPath, file);
-  const cmd = `cd ${rootPath} && node ${iwFile}`;
+const run = async (funcName: string, env: string) => {
+  const file = genCodeFile(funcName);
+  const bootFile = genBootFile(file);
+  const cmd = `cd ${mVscode.rootPath} && node ${bootFile}`;
   console.log('will run cmd: ', cmd);
   return await execSync(cmd);
 };
 
-const genCodeFile = (vscode: any, funcName: string) => {
-  const fileName = vscode.window.activeTextEditor.document.fileName;
-  const basename = path.basename(fileName);
+const genCodeFile = (funcName: string) => {
+  const basename = path.basename(mVscode.fileName);
   const isController = /Controller\.[^\.]+$/.test(basename);
   if (isController) {
-    return genControllerFile(vscode, funcName, fileName);
+    return genControllerFile(funcName);
   }
   throw new Error('itwork-js 无法处理改文件！');
 };
 
-const genControllerFile = (vscode: any, funcName: string, fileName: string) => {
+const genControllerFile = (funcName: string) => {
+  const fileName = mVscode.fileName;
   const destFile = path.dirname(fileName) + path.sep + '.iw' + path.extname(fileName);
 
-  const code = vscode.window.activeTextEditor.document.getText();
-  const params = getParams(code, funcName);
-  const scriptType = vscode.window.activeTextEditor.document.languageId;
-  fs.writeFileSync(destFile, genCallCode(code, funcName, params, scriptType));
+  const code = mVscode.documentText;
+  const funcInfo = parse(code, funcName);
+  mVscode.log(`解析出函数名：${funcInfo.funcName}，参数：${funcInfo.params}`);
+  fs.writeFileSync(destFile, genCallCode(code, funcInfo.funcName, funcInfo.params));
   return destFile;
 };
 
-const genCallCode = (code: string, funcName: string, params: any[], scriptType: string) => {
-  const isTs = scriptType === 'typescript';
+const genCallCode = (code: string, funcName: string, params: any[]) => {
+  const isTs = mVscode.languageId === 'typescript';
   const resCode = `
   const res = {
     ok: v => v,
+    send: v => v,
     wrap: async fn => await fn()
   }
   `;
@@ -63,7 +63,7 @@ const genCallCode = (code: string, funcName: string, params: any[], scriptType: 
   `;
 };
 
-const genIWFile = (rootPath: string, codeFile: string) => {
+const genBootFile = (codeFile: string) => {
   const code = `
     require('ts-node/register');
 
@@ -79,7 +79,7 @@ const genIWFile = (rootPath: string, codeFile: string) => {
       require('${codeFile}');
     });
   `;
-  const file = `${rootPath}/.iw.boot.js`;
+  const file = `${mVscode.rootPath}/.iw.boot.js`;
   fs.writeFileSync(file, code);
   return file;
 };

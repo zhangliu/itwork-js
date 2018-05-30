@@ -2,7 +2,7 @@
     "name": "itwork-js",
     "displayName": "itwork-js",
     "description": "",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "publisher": "zhangliu",
     "repository": "https://github.com/zhangliu/itwork-js",
     "icon": "icon.png",
@@ -41,6 +41,7 @@
     },
     "dependencies": {
         "@babel/parser": "^7.0.0-beta.48",
+        "lodash": "^4.17.10",
         "moment": "^2.22.1"
     }
 }
