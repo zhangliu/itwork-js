@@ -2,37 +2,33 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { execSync } from '../libs/exec';
 import { mVscode } from '../libs/mVscode';
-import { parse } from '../libs/parses/jsParse';
 
-const run = async (funcName: string, env: string) => {
-  const file = genCodeFile(funcName);
+const run = async (funcName: string, params: any[]) => {
+  const file = genCodeFile(funcName, params);
   const bootFile = genBootFile(file);
   const cmd = `cd ${mVscode.rootPath} && node ${bootFile}`;
   console.log('will run cmd: ', cmd);
   return await execSync(cmd);
 };
 
-const genCodeFile = (funcName: string) => {
+const genCodeFile = (funcName: string, params: any[]) => {
   const basename = path.basename(mVscode.fileName);
   const isController = /Controller\.[^\.]+$/.test(basename);
   if (isController) {
-    return genControllerFile(funcName);
+    return genControllerFile(funcName, params);
   }
   throw new Error('itwork-js 无法处理改文件！');
 };
 
-const genControllerFile = (funcName: string) => {
+const genControllerFile = (funcName: string, params: any[]) => {
   const fileName = mVscode.fileName;
   const destFile = path.dirname(fileName) + path.sep + '.iw' + path.extname(fileName);
 
-  const code = mVscode.documentText;
-  const funcInfo = parse(code, funcName);
-  mVscode.log(`解析出函数名：${funcInfo.funcName}，参数：${funcInfo.params}`);
-  fs.writeFileSync(destFile, genCallCode(code, funcInfo.funcName, funcInfo.params));
+  fs.writeFileSync(destFile, genCallCode(funcName, params));
   return destFile;
 };
 
-const genCallCode = (code: string, funcName: string, params: any[]) => {
+const genCallCode = (funcName: string, params: any[]) => {
   const isTs = mVscode.languageId === 'typescript';
   const resCode = `
   const res = {
@@ -51,7 +47,7 @@ const genCallCode = (code: string, funcName: string, params: any[]) => {
   return `
   ${isTs ? 'declare var console: any;' : ''}
   ${isTs ? 'declare var process: any;' : ''}
-  ${code}
+  ${mVscode.documentText}
   const iwResult = async () => {
     ${resCode}
     ${resultCode}

@@ -38,6 +38,14 @@ class MVscode {
   public get cursorPosition() {
     return this.currentEditor ? this.currentEditor.selection.start : null;
   }
+
+  public getText(startChar: number, startLine: number, endChar: number, endLine: number) {
+    if (!this.currentEditor) {
+      return '';
+    }
+    const range = new vscode.Range(startChar, startLine, endChar, endLine);
+    return this.currentEditor.document.getText(range);
+  }
 }
 
 const mVscode: MVscode = new MVscode();

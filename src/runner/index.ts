@@ -2,6 +2,7 @@ import { getEnv } from '../libs/env';
 import * as commonRunner from './commonRunner';
 import * as sailsRunner from './sailsRunner';
 import { mVscode } from '../libs/mVscode';
+import { parse } from '../libs/parses/jsParse';
 
 let lastFunc: string;
 
@@ -11,18 +12,20 @@ const run = async () => {
   }
 
   lastFunc = mVscode.selectedText || lastFunc;
-  mVscode.log(`解析出需要调用的函数：${lastFunc}`);
+  const code = mVscode.documentText;
+  const funcInfo = parse(code, lastFunc);
+  mVscode.log(`解析出函数名：${funcInfo.funcName}，参数：${funcInfo.params}`);
 
   try {
     let result: any = 'iw无法在该环境下运行！';
     const env = getEnv(mVscode.rootPath);
     if (!env) {
-      result = commonRunner.run(lastFunc);
+      result = commonRunner.run(funcInfo.funcName, funcInfo.params);
     }
 
     mVscode.log(`解析出运行环境：${env}`);
     if (/^sails@.*/.test(env)) {
-      result = await sailsRunner.run(lastFunc, env);
+      result = await sailsRunner.run(funcInfo.funcName, funcInfo.params);
     }
     mVscode.log(`运行结果：${result}`);
   } catch (err) {
