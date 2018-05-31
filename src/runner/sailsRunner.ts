@@ -61,7 +61,6 @@ const genCallCode = (funcName: string, params: any[]) => {
 const genBootFile = (codeFile: string) => {
   const code = `
     ${mVscode.isTs ? 'require(\'ts-node/register\')' : ''}
-
     const sails = require('sails');
 
     sails.lift({
