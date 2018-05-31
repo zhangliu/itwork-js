@@ -47,6 +47,10 @@ class MVscode {
     const range = new vscode.Range(startChar, startLine, endChar, endLine);
     return this.currentEditor.document.getText(range);
   }
+
+  public get isTs() {
+    return this.languageId === 'typescript';
+  }
 }
 
 const mVscode: MVscode = new MVscode();

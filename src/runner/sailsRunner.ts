@@ -29,7 +29,6 @@ const genControllerFile = (funcName: string, params: any[]) => {
 };
 
 const genCallCode = (funcName: string, params: any[]) => {
-  const isTs = mVscode.languageId === 'typescript';
   const resCode = `
   const res = {
     ok: v => v,
@@ -45,8 +44,8 @@ const genCallCode = (funcName: string, params: any[]) => {
     resultCode = `return await ${funcName} (${params[0]}, res)`;
   }
   return `
-  ${isTs ? 'declare var console: any;' : ''}
-  ${isTs ? 'declare var process: any;' : ''}
+  ${mVscode.isTs ? 'declare var console: any;' : ''}
+  ${mVscode.isTs ? 'declare var process: any;' : ''}
   ${mVscode.documentText}
   const iwResult = async () => {
     ${resCode}
@@ -61,7 +60,7 @@ const genCallCode = (funcName: string, params: any[]) => {
 
 const genBootFile = (codeFile: string) => {
   const code = `
-    require('ts-node/register');
+    ${mVscode.isTs ? 'require(\'ts-node/register\')' : ''}
 
     const sails = require('sails');
 
