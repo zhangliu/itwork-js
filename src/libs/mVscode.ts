@@ -1,12 +1,13 @@
 import * as vscode from 'vscode';
 import * as moment from 'moment';
+const chan = vscode.window.createOutputChannel('itwork-js');
 
 class MVscode {
   public log(str: string, line: boolean = true) {
-    const vsConsole = vscode.debug.activeDebugConsole;
-    const log = line ? vsConsole.appendLine : vsConsole.append;
+    chan.show(true);
+    const log = line ? chan.appendLine : chan.append;
     const pre = `${moment().format('HH:mm:ss')} => `;
-    log.call(vsConsole, `${pre}${str}`);
+    log.call(chan, `${pre}${str}`);
   }
 
   public get selectedText() {
