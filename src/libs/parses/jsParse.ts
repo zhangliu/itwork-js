@@ -36,7 +36,7 @@ const getFuncInfo = (node: any, funcName: string) => {
 const getVariableDeclarationFuncInfo = (node: any, funcName: string) => {
   const funcTypes = ['ArrowFunctionExpression', 'FunctionExpression'];
   const initType = _.get(node, 'declarations[0].init.type');
-  const varName = _.get(node, 'declarations[0].id.name')
+  const varName = _.get(node, 'declarations[0].id.name');
   const isFunc = funcTypes.indexOf(initType) !== -1;
   if (isFunc) {
     const isSameFunc = funcName === varName;
@@ -66,13 +66,33 @@ const getExpressionStatementFuncInfo = (node: any, funcName: string) => {
     leftName = left.name;
   }
   if (right.type === 'ObjectExpression') {
-    const methodNodes = right.properties.filter((p: any) => p.type === 'ObjectMethod');
-    const funcNode = methodNodes.find((n: any) => n.key.name === funcName);
-    return funcNode ? { funcName: `${leftName}.${funcName}`, params: getParams(funcNode) } : null;
+    const funcInfo = getObjectExpressionFuncInfo(right, funcName);
+    if (!funcInfo) {
+      return;
+    }
+    const newFuncName = `${leftName}.${funcInfo.funcName}`;
+    return funcInfo ? { funcName: newFuncName, params: funcInfo.params } : null;
   }
   if (right.type === 'FunctionExpression') {
     const isSame = funcName === leftName;
     return isSame ? { funcName: leftName, params: getParams(node) } : null;
+  }
+};
+
+const getObjectExpressionFuncInfo = (node: any, funcName: string) => {
+  for (const prop of node.properties) {
+    if (prop.type === 'ObjectProperty' && prop.value.type === 'FunctionExpression') {
+      if (prop.key.name === funcName) {
+        return { funcName, params: getParams(prop) };
+      }
+      continue;
+    }
+    if (prop.type === 'ObjectMethod') {
+      if (prop.key.name === funcName) {
+        return { funcName, params: getParams(prop) };
+      }
+      continue;
+    }
   }
 };
 
