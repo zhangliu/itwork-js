@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 const { execSync } = require('child_process');
 import { mVscode } from '../libs/mVscode';
-import * as commonTemplate from '../libs/code/templates/common';
+import * as commonTemplate from '../libs/code/templates/commonTpl';
 
 const run = (funcName: string, params: any[]) => {
   const file = genFile(funcName, params);
