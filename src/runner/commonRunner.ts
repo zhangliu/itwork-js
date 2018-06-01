@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 const { execSync } = require('child_process');
 import { mVscode } from '../libs/mVscode';
+import * as commonTemplate from '../libs/code/templates/common';
 
 const run = (funcName: string, params: any[]) => {
   const file = genFile(funcName, params);
@@ -11,16 +12,9 @@ const run = (funcName: string, params: any[]) => {
 const genFile = (funcName: string, params: any[]) => {
   const fileName = mVscode.fileName;
   const destFile = path.dirname(fileName) + path.sep + '.iw' + path.extname(fileName);
-  fs.writeFileSync(destFile, genCallCode(funcName, params));
+  const code = commonTemplate.genCode(funcName, params, mVscode.documentText, mVscode.languageId);
+  fs.writeFileSync(destFile, code);
   return destFile;
-};
-
-const genCallCode = (funcName: string, params: any[]) => {
-  return `
-    ${mVscode.documentText}
-    const iwResult = async () => await ${funcName}(${params.join(',')})
-    iwResult().then(console.log)
-  `;
 };
 
 export {
