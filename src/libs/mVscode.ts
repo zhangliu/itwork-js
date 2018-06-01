@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as moment from 'moment';
+import * as path from 'path';
 const chan = vscode.window.createOutputChannel('itwork-js');
 
 class MVscode {
@@ -30,6 +31,10 @@ class MVscode {
 
   public get fileName() {
     return this.currentEditor ? this.currentEditor.document.fileName : '';
+  }
+
+  public get baseFileName() {
+    return this.currentEditor ? path.basename(this.currentEditor.document.fileName) : '';
   }
 
   public get documentText() {

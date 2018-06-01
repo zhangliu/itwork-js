@@ -36,7 +36,7 @@ const run = async () => {
 const canRun = () => {
   const languages = ['javascript', 'typescript'];
   const isIn = languages.indexOf(mVscode.languageId) !== -1;
-  const isIWfile = /^\.iw\..*$/.test(mVscode.fileName);
+  const isIWfile = /^\.iw\..*$/.test(mVscode.baseFileName);
   if (!isIn || isIWfile) {
     return false;
   }

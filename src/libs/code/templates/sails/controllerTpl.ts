@@ -15,17 +15,14 @@ const genCode = (funcName: string, params: any[], source: string, languageId: st
     resultCode = `return await ${funcName} (${params[0]}, res)`;
   }
   return `
-  ${isTs ? 'declare var console: any;' : ''}
-  ${isTs ? 'declare var process: any;' : ''}
-  ${source}
-  const iwResult = async () => {
-    ${resCode}
-    ${resultCode}
-  }
-  iwResult().then(console.log).then(process.exit).catch(err => {
-    console.log(err)
-    process.exit()
-  })
+    ${isTs ? 'declare var console: any;' : ''}
+    ${isTs ? 'declare var process: any;' : ''}
+    ${source}
+    const iwResult = async () => {
+      ${resCode}
+      ${resultCode}
+    }
+    ${isTs ? 'export iwResult' : 'module.exports.iwResult = iwResult;'}
   `;
 };
 export {

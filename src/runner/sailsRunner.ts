@@ -2,8 +2,9 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { execSync } from '../libs/exec';
 import { mVscode } from '../libs/mVscode';
-import * as commonTemplate from '../libs/code/templates/common';
-import * as sControllerTemplate from '../libs/code/templates/sailsController';
+import * as commonTpl from '../libs/code/templates/sails/commonTpl';
+import * as controllerTpl from '../libs/code/templates/sails/controllerTpl';
+import * as bootTpl from '../libs/code/templates/sails/bootTpl';
 
 const run = async (funcName: string, params: any[]) => {
   const file = genCodeFile(funcName, params);
@@ -21,29 +22,16 @@ const genCodeFile = (funcName: string, params: any[]) => {
   const isController = /Controller\.[^\.]+$/.test(basename);
   let code: string;
   if (isController) {
-    code = sControllerTemplate.genCode(funcName, params, mVscode.documentText, mVscode.languageId);
+    code = controllerTpl.genCode(funcName, params, mVscode.documentText, mVscode.languageId);
   } else {
-    code = commonTemplate.genCode(funcName, params, mVscode.documentText, mVscode.languageId);
+    code = commonTpl.genCode(funcName, params, mVscode.documentText, mVscode.languageId);
   }
   fs.writeFileSync(destFile, code);
   return destFile;
 };
 
 const genBootFile = (codeFile: string) => {
-  const code = `
-    ${mVscode.isTs ? 'require(\'ts-node/register\')' : ''}
-    const sails = require('sails');
-
-    sails.lift({
-      hooks: { grunt: false },
-      log: { level: 'warn' },
-    }, (err) => {
-      if (err) {
-        return console.log(err);
-      }
-      require('${codeFile}');
-    });
-  `;
+  const code = bootTpl.genCode(codeFile, mVscode.languageId);
   const file = `${mVscode.rootPath}/.iw.boot.js`;
   fs.writeFileSync(file, code);
   return file;
