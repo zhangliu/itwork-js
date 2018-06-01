@@ -22,7 +22,7 @@ const genCode = (funcName: string, params: any[], source: string, languageId: st
       ${resCode}
       ${resultCode}
     }
-    ${isTs ? 'export iwResult' : 'module.exports.iwResult = iwResult;'}
+    ${isTs ? 'export {iwResult}' : 'module.exports.iwResult = iwResult;'}
   `;
 };
 export {

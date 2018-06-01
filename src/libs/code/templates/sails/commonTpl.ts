@@ -6,7 +6,7 @@ const genCode = (funcName: string, params: any[], source: string, languageId: st
     ${isTs ? 'declare var process: any;' : ''}
     ${source}
     const iwResult = async () => await ${funcName}(${params.join(',')})
-    ${isTs ? 'export iwResult' : 'module.exports.iwResult = iwResult;'}
+    ${isTs ? 'export {iwResult}' : 'module.exports.iwResult = iwResult;'}
   `;
 };
 export {
