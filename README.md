@@ -24,4 +24,4 @@ const test = (params) => {
 
 目前可以调试的文件有：
 * 普通的js/ts文件
-* sails框架的controller文件
+* sails框架的controller、service等文件
