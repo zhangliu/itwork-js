@@ -15,8 +15,6 @@ const genCode = (funcName: string, params: any[], source: string, languageId: st
     resultCode = `return await ${funcName} (${params[0]}, res)`;
   }
   return `
-    ${isTs ? 'declare var console: any;' : ''}
-    ${isTs ? 'declare var process: any;' : ''}
     ${source}
     const iwResult = async () => {
       ${resCode}
