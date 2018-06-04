@@ -102,9 +102,11 @@ const getParams = (obj: any) => {
   if (!Array.isArray(obj.leadingComments)) {
     return [];
   }
-  obj.leadingComments.map((c: any) => {
+  const cReg = /^(.*?=)(.*)$/
+  const comments = obj.leadingComments.filter((c: any) => cReg.test(c.value) && c.type === 'CommentLine');
+  comments.map((c: any) => {
     const paramsStr = trim(c.value);
-    const subParams = trim(paramsStr.replace(/^(.*?=)(.*)$/, '$2'));
+    const subParams = trim(paramsStr.replace(cReg, '$2'));
     params = params.concat(subParams);
   });
   return params;
