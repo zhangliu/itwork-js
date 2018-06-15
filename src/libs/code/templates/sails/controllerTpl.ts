@@ -1,5 +1,4 @@
-const genCode = (funcName: string, params: any[], source: string, languageId: string) => {
-  const isTs = languageId === 'typescript';
+const genCode = (funcName: string, params: any[], source: string, isTs: boolean) => {
   const resCode = `
     const res = {
       ok: v => v,

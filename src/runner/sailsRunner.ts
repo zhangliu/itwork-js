@@ -22,16 +22,16 @@ const genCodeFile = (funcName: string, params: any[]) => {
   const isController = /Controller\.[^\.]+$/.test(basename);
   let code: string;
   if (isController) {
-    code = controllerTpl.genCode(funcName, params, mVscode.documentText, mVscode.languageId);
+    code = controllerTpl.genCode(funcName, params, mVscode.documentText, mVscode.isTs);
   } else {
-    code = commonTpl.genCode(funcName, params, mVscode.documentText, mVscode.languageId);
+    code = commonTpl.genCode(funcName, params, mVscode.documentText, mVscode.isTs);
   }
   fs.writeFileSync(destFile, code);
   return destFile;
 };
 
 const genBootFile = (codeFile: string) => {
-  const code = bootTpl.genCode(codeFile, mVscode.languageId);
+  const code = bootTpl.genCode(codeFile, mVscode.isTs);
   const file = `${mVscode.rootPath}/.iw.boot.js`;
   fs.writeFileSync(file, code);
   return file;

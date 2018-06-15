@@ -6,13 +6,13 @@ import * as commonTemplate from '../libs/code/templates/commonTpl';
 
 const run = (funcName: string, params: any[]) => {
   const file = genFile(funcName, params);
-  return execSync(`node ${file}`);
+  return mVscode.isTs ? execSync(`ts-node ${file}`) : execSync(`node ${file}`);
 };
 
 const genFile = (funcName: string, params: any[]) => {
   const fileName = mVscode.fileName;
   const destFile = path.dirname(fileName) + path.sep + '.iw' + path.extname(fileName);
-  const code = commonTemplate.genCode(funcName, params, mVscode.documentText, mVscode.languageId);
+  const code = commonTemplate.genCode(funcName, params, mVscode.documentText, mVscode.isTs);
   fs.writeFileSync(destFile, code);
   return destFile;
 };

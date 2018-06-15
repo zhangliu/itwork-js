@@ -1,6 +1,5 @@
 
-const genCode = (funcName: string, params: any[], source: string, languageId: string) => {
-  const isTs = languageId === 'typescript';
+const genCode = (funcName: string, params: any[], source: string, isTs: boolean) => {
   return `
     ${source}
     const iwResult = async () => await ${funcName}(${params.join(',')})

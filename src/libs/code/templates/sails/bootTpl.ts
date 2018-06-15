@@ -1,5 +1,4 @@
-const genCode = (codeFile: string, languageId: string) => {
-  const isTs = languageId === 'typescript';
+const genCode = (codeFile: string, isTs: boolean) => {
   return `
     ${isTs ? 'require(\'ts-node/register\')' : ''}
     const sails = require('sails');

@@ -1,6 +1,5 @@
 
-const genCode = (funcName: string, params: any[], source: string, languageId: string) => {
-  const isTs = languageId === 'typescript';
+const genCode = (funcName: string, params: any[], source: string, isTs: boolean) => {
   return `
     ${isTs ? 'declare var console: any;' : ''}
     ${isTs ? 'declare var process: any;' : ''}
