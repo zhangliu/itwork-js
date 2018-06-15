@@ -20,7 +20,7 @@ const run = async () => {
     let result: any = 'iw无法在该环境下运行！';
     const env = getEnv(mVscode.rootPath);
     if (!env) {
-      result = commonRunner.run(funcInfo.funcName, funcInfo.params);
+      result = await commonRunner.run(funcInfo.funcName, funcInfo.params);
     }
 
     mVscode.log(`解析出运行环境：${env}`);
