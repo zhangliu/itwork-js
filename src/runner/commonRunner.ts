@@ -1,12 +1,12 @@
 import * as fs from 'fs';
 import * as path from 'path';
-const { execSync } = require('child_process');
+import { execSync } from '../libs/exec';
 import { mVscode } from '../libs/mVscode';
 import * as commonTemplate from '../libs/code/templates/commonTpl';
 
-const run = (funcName: string, params: any[]) => {
+const run = async (funcName: string, params: any[]) => {
   const file = genFile(funcName, params);
-  return mVscode.isTs ? execSync(`ts-node ${file}`) : execSync(`node ${file}`);
+  return mVscode.isTs ? await execSync(`ts-node ${file}`) : await execSync(`node ${file}`);
 };
 
 const genFile = (funcName: string, params: any[]) => {
