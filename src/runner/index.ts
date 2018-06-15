@@ -17,17 +17,16 @@ const run = async () => {
   mVscode.log(`解析出函数名：${funcInfo.funcName}，参数：${funcInfo.params}`);
 
   try {
-    let result: any = 'iw无法在该环境下运行！';
     const env = getEnv(mVscode.rootPath);
     if (!env) {
-      result = await commonRunner.run(funcInfo.funcName, funcInfo.params);
+      return commonRunner.run(funcInfo.funcName, funcInfo.params);
     }
 
     mVscode.log(`解析出运行环境：${env}`);
     if (/^sails@.*/.test(env)) {
-      result = await sailsRunner.run(funcInfo.funcName, funcInfo.params);
+      return sailsRunner.run(funcInfo.funcName, funcInfo.params);
     }
-    mVscode.log(`运行结果：${result}`);
+    mVscode.log('无法在该环境下运行！');
   } catch (err) {
     return mVscode.log(`运行发生错误：${err.message}`);
   }

@@ -1,12 +1,12 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { execSync } from '../libs/exec';
 import { mVscode } from '../libs/mVscode';
 import * as commonTemplate from '../libs/code/templates/commonTpl';
 
 const run = async (funcName: string, params: any[]) => {
   const file = genFile(funcName, params);
-  return mVscode.isTs ? await execSync(`ts-node ${file}`) : await execSync(`node ${file}`);
+  const cmd = `cd ${mVscode.rootPath} && ${mVscode.isTs ? 'ts-node' : 'node'} ${file}`;
+  return mVscode.exec(cmd);
 };
 
 const genFile = (funcName: string, params: any[]) => {

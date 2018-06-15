@@ -1,17 +1,16 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import { execSync } from '../libs/exec';
 import { mVscode } from '../libs/mVscode';
 import * as commonTpl from '../libs/code/templates/sails/commonTpl';
 import * as controllerTpl from '../libs/code/templates/sails/controllerTpl';
 import * as bootTpl from '../libs/code/templates/sails/bootTpl';
 
-const run = async (funcName: string, params: any[]) => {
+const run = (funcName: string, params: any[]) => {
   const file = genCodeFile(funcName, params);
   const bootFile = genBootFile(file);
   const cmd = `cd ${mVscode.rootPath} && node ${bootFile}`;
   console.log('will run cmd: ', cmd);
-  return await execSync(cmd);
+  return mVscode.exec(cmd);
 };
 
 const genCodeFile = (funcName: string, params: any[]) => {

@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as moment from 'moment';
 import * as path from 'path';
 const chan = vscode.window.createOutputChannel('itwork-js');
+const tml = vscode.window.createTerminal('itwork-js');
 
 class MVscode {
   public log(str: string, line: boolean = true) {
@@ -9,6 +10,11 @@ class MVscode {
     const log = line ? chan.appendLine : chan.append;
     const pre = `${moment().format('HH:mm:ss')} => `;
     log.call(chan, `${pre}${str}`);
+  }
+
+  public exec(cmd: string) {
+    tml.show(true);
+    tml.sendText(cmd);
   }
 
   public get selectedText() {
