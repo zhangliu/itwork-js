@@ -4,16 +4,13 @@ import * as sailsRunner from './sailsRunner';
 import { mVscode } from '../libs/mVscode';
 import { parse } from '../libs/parses/jsParse';
 
-let lastFunc: string;
-
 const run = async () => {
   if (!canRun()) {
     return mVscode.log('itwork-js 无法运行改文件！');
   }
 
-  lastFunc = mVscode.selectedText || lastFunc;
   const code = mVscode.documentText;
-  const funcInfo = parse(code, lastFunc);
+  const funcInfo = parse(code, mVscode.selectedText || '');
   mVscode.log(`解析出函数名：${funcInfo.funcName}，参数：${funcInfo.params}`);
 
   try {
