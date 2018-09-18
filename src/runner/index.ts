@@ -1,8 +1,11 @@
 import { getEnv } from '../libs/env';
 import * as commonRunner from './commonRunner';
 import * as sailsRunner from './sailsRunner';
+import * as reactRunner from './reactRunner';
 import { mVscode } from '../libs/mVscode';
 import { parse } from '../libs/parses/jsParse';
+
+let preFunc: string
 
 const run = async () => {
   if (!canRun()) {
@@ -10,11 +13,13 @@ const run = async () => {
   }
 
   const code = mVscode.documentText;
-  const funcInfo = parse(code, mVscode.selectedText || '');
+  preFunc = mVscode.selectedText || preFunc
+  const funcInfo = parse(code, preFunc);
   mVscode.log(`解析出函数名：${funcInfo.funcName}，参数：${funcInfo.params}`);
 
   try {
     const env = getEnv(mVscode.rootPath);
+
     if (!env) {
       return commonRunner.run(funcInfo.funcName, funcInfo.params);
     }
@@ -22,6 +27,10 @@ const run = async () => {
     mVscode.log(`解析出运行环境：${env}`);
     if (/^sails@.*/.test(env)) {
       return sailsRunner.run(funcInfo.funcName, funcInfo.params);
+    }
+
+    if (env === 'react') {
+      return reactRunner.run(funcInfo.funcName, funcInfo.params)
     }
     mVscode.log('无法在该环境下运行！');
   } catch (err) {

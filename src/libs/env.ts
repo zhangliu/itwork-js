@@ -8,8 +8,12 @@ const getEnv = (rootPath: string): string => {
   if (fs.existsSync(`${rootPath}/.sailsrc`)) {
     return 'sails@1.0.0';
   }
-  // const packageJSON = fs.readFileSync(filePath).toString();
-  // const packageObj = JSON.parse(packageJSON)
+  try {
+    const packageJSON = fs.readFileSync(filePath).toString();
+    const packageObj = JSON.parse(packageJSON)
+    if (packageObj.dependencies.react) return 'react'
+  } catch(err) {}
+
   return '';
 };
 
